@@ -24,9 +24,9 @@ program
     .option('-x, --excluded-tables <list>', 'exclude these tables from backup', list)
     .option('-i, --included-tables <list>', 'only backup these tables', list)
     .option('-p, --backup-path <name>', 'backup path to store table dumps in. default is DynamoDB-backup-YYYY-MM-DD-HH-mm-ss')
-    .option('--aws-key', 'AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set')
-    .option('--aws-secret', 'AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set')
-    .option('--aws-region', 'AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set')
+    .option('--aws-key <name>', 'AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set')
+    .option('--aws-secret <name>', 'AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set')
+    .option('--aws-region <name>', 'AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set')
     .parse(process.argv);
 
 // run program
@@ -64,7 +64,11 @@ dynamoBackup.on('end-backup', function(tableName) {
     console.log('Done copying table ' + tableName + '. Took ' + endTime.diff(startTime, 'minutes', true).toFixed(2) + ' minutes');
 });
 
-dynamoBackup.backupAllTables(function() {
+dynamoBackup.backupAllTables(function(err) {
+    if (err) {
+        console.log("Error backing up", err);
+        process.exit(0);
+    } 
     console.log('Finished backing up DynamoDB');
     process.exit(0);
 });
